@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- HTML5 doctype and meta tags for responsive design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gut Microbiome Memory Game</title>
+    <style>
+        /* ===== CSS STYLES =====
+           Comprehensive styling demonstrating modern CSS techniques:
+           - CSS Grid for game layout
+           - Flexbox for component alignment
+           - CSS animations and transitions
+           - Custom properties (CSS variables)
+           - Responsive design principles
+        */
+
+        /* CSS Custom Properties for consistent theming */
+        :root {
+            --primary-color: #2c5530;
+            --secondary-color: #87ceeb;
+            --accent-color: #ff00ff;
+            --card-width: 180px;
+            --card-height: 140px;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        /* Global styles with modern CSS reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8f5e8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Header styling with text effects */
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #2d5016;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        /* Game container with glassmorphism effect */
+        .game-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* Statistics display using Flexbox */
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* CSS Grid for game board layout */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px auto;
+            perspective: 1000px; /* 3D perspective for flip effect */
+            max-width: 700px;
+            justify-content: center;
+        }
+
+        /* Individual card styling with 3D flip animation */
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform var(--transition-speed);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            opacity: 0.6;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        /* Card faces - front and back */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-align: center;
+            backface-visibility: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all var(--transition-speed);
+        }
+
+        .card-back {
+            background: linear-gradient(45deg, #87ceeb, #b0e0e6);
+            color: white;
+        }
+
+        .card-front {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+            padding: 4px;
+            font-size: 0.55em;
+            line-height: 1.0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        /* Hover effects for better UX */
+        .card:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card.flipped:hover {
+            transform: rotateY(180deg) translateY(-3px) scale(1.05);
+        }
+
+        /* Control buttons styling */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--accent-color), #ff8a65);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff8a65, var(--accent-color));
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Success message animation */
+        .success-message {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Information panel styling */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 30px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            :root {
+                --card-width: 130px;
+                --card-height: 100px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            :root {
+                --card-width: 120px;
+                --card-height: 90px;
+            }
+        }
+
+        /* CSS Animation keyframes */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gut Microbiome Memory Game</h1>
+    <p class="subtitle">Match pairs of beneficial gut bacteria to win!</p>
+
+    <div class="game-container">
+        <!-- Game statistics display -->
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-number" id="moves">0</span>
+                <span class="stat-label">Moves</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="matches">0</span>
+                <span class="stat-label">Matches</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="timer">0</span>
+                <span class="stat-label">Seconds</span>
+            </div>
+        </div>
+
+        <!-- Game board container -->
+        <div class="game-board" id="gameBoard">
+            <!-- Cards will be dynamically generated by JavaScript -->
+        </div>
+
+        <!-- Success message -->
+        <div class="success-message" id="successMessage">
+            Congratulations! You've restored gut microbiome balance!
+        </div>
+
+        <!-- Game controls -->
+        <div class="controls">
+            <button class="btn" onclick="startNewGame()">New Game</button>
+            <button class="btn" onclick="resetGame()">Reset</button>
+            <button class="btn" onclick="showHint()">Hint</button>
+        </div>
+
+        <!-- Educational information panel -->
+        <div class="info-panel">
+            <h3>About Gut Microbiome:</h3>
+            <p>The gut microbiome consists of trillions of microorganisms living in your digestive tract. 
+            These beneficial bacteria play crucial roles in digestion, immune function, and overall health. 
+            Each bacteria type in this game represents real microorganisms that contribute to a healthy gut ecosystem!</p>
+        </div>
+    </div>
+
+    <script>
+        /* ===== JAVASCRIPT GAME LOGIC =====
+           Comprehensive JavaScript demonstrating:
+           - Object-oriented programming concepts
+           - Array manipulation and algorithms
+           - DOM manipulation and event handling
+           - Game state management
+           - Timer functions and intervals
+           - Modern ES6+ syntax (const/let, arrow functions, template literals)
+        */
+
+        // Game data: Real gut bacteria with their benefits
+        const bacteriaData = [
+            { name: "Lactobacillus", benefit: "Improves lactose digestion" },
+            { name: "Bifidobacterium", benefit: "Supports immune system" },
+            { name: "Akkermansia", benefit: "Maintains gut barrier" },
+            { name: "Faecalibacterium", benefit: "Produces anti-inflammatory compounds" },
+            { name: "Bacteroides", benefit: "Breaks down complex carbs" },
+            { name: "Enterococcus", benefit: "Prevents harmful bacteria growth" },
+            { name: "Clostridium", benefit: "Produces beneficial fatty acids" },
+            { name: "Streptococcus", benefit: "Supports digestive health" }
+        ];
+
+        // Game state variables
+        let gameState = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            moves: 0,
+            startTime: null,
+            timerInterval: null,
+            gameActive: false
+        };
+
+        /* Initialize game when page loads
+           Uses modern event listener syntax */
+        document.addEventListener('DOMContentLoaded', function() {
+            startNewGame();
+        });
+
+        /* Main game initialization function
+           Demonstrates array manipulation and DOM generation */
+        function startNewGame() {
+            // Reset game state
+            gameState = {
+                cards: [],
+                flippedCards: [],
+                matchedPairs: 0,
+                moves: 0,
+                startTime: Date.now(),
+                timerInterval: null,
+                gameActive: true
+            };
+
+            // Create pairs of cards (duplicate each bacteria)
+            const cardPairs = [...bacteriaData, ...bacteriaData];
+            
+            // Shuffle algorithm (Fisher-Yates shuffle)
+            for (let i = cardPairs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardPairs[i], cardPairs[j]] = [cardPairs[j], cardPairs[i]];
+            }
+
+            gameState.cards = cardPairs;
+            generateGameBoard();
+            startTimer();
+            updateStats();
+            hideSuccessMessage();
+        }
+
+        /* DOM manipulation function to create game board
+           Shows modern JavaScript templating and event handling */
+        function generateGameBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = ''; // Clear existing cards
+
+            gameState.cards.forEach((bacteria, index) => {
+                // Create card element using template literals
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.bacteria = bacteria.name;
+
+                // HTML template for card structure
+                card.innerHTML = `
+                    <div class="card-face card-back">
+                        <div style="font-size: 2em;">🧫</div>
+                        <small>Bacteria</small>
+                    </div>
+                    <div class="card-face card-front">
+                        <strong>${bacteria.name}:</strong><br>
+                        <small>${bacteria.benefit}</small>
+                    </div>
+                `;
+
+                // Add event listener using modern arrow function
+                card.addEventListener('click', () => handleCardClick(index));
+                gameBoard.appendChild(card);
+            });
+        }
+
+        /* Card click handler with game logic
+           Demonstrates conditional logic and array methods */
+        function handleCardClick(cardIndex) {
+            // Prevent clicks when game is inactive or card already flipped
+            if (!gameState.gameActive || 
+                gameState.flippedCards.length === 2 || 
+                gameState.flippedCards.includes(cardIndex) ||
+                document.querySelector(`[data-index="${cardIndex}"]`).classList.contains('matched')) {
+                return;
+            }
+
+            // Flip the clicked card
+            const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
+            cardElement.classList.add('flipped');
+            gameState.flippedCards.push(cardIndex);
+
+            // Check for match when two cards are flipped
+            if (gameState.flippedCards.length === 2) {
+                gameState.moves++;
+                updateStats();
+                
+                setTimeout(() => checkForMatch(), 600); // Delay for visual effect
+            }
+        }
+
+        /* Match checking logic
+           Shows object comparison and DOM class manipulation */
+        function checkForMatch() {
+            const [firstIndex, secondIndex] = gameState.flippedCards;
+            const firstCard = gameState.cards[firstIndex];
+            const secondCard = gameState.cards[secondIndex];
+
+            if (firstCard.name === secondCard.name) {
+                // Match found!
+                const card1 = document.querySelector(`[data-index="${firstIndex}"]`);
+                const card2 = document.querySelector(`[data-index="${secondIndex}"]`);
+                
+                card1.classList.add('matched', 'pulse');
+                card2.classList.add('matched', 'pulse');
+                
+                gameState.matchedPairs++;
+                
+                // Check win condition
+                if (gameState.matchedPairs === bacteriaData.length) {
+                    gameWon();
+                }
+            } else {
+                // No match - flip cards back
+                setTimeout(() => {
+                    const card1 = document.querySelector(`[data-index="${firstIndex}"]`);
+                    const card2 = document.querySelector(`[data-index="${secondIndex}"]`);
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 300);
+            }
+
+            // Reset flipped cards array
+            gameState.flippedCards = [];
+            updateStats();
+        }
+
+        /* Game completion handler
+           Demonstrates timer management and UI updates */
+        function gameWon() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            setTimeout(() => {
+                showSuccessMessage();
+                // Add celebration effect to all cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.add('pulse');
+                });
+            }, 500);
+        }
+
+        /* Timer functionality using setInterval
+           Shows date manipulation and DOM updates */
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+                document.getElementById('timer').textContent = elapsed;
+            }, 1000);
+        }
+
+        /* Statistics update function
+           Demonstrates getElementById and textContent manipulation */
+        function updateStats() {
+            document.getElementById('moves').textContent = gameState.moves;
+            document.getElementById('matches').textContent = gameState.matchedPairs;
+        }
+
+        /* UI helper functions for success message */
+        function showSuccessMessage() {
+            document.getElementById('successMessage').classList.add('show');
+        }
+
+        function hideSuccessMessage() {
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        /* Game control functions */
+        function resetGame() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            // Reset all cards
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('flipped', 'matched', 'pulse');
+            });
+
+            // Reset game state
+            gameState.flippedCards = [];
+            gameState.matchedPairs = 0;
+            gameState.moves = 0;
+            gameState.startTime = Date.now();
+            gameState.gameActive = true;
+
+            updateStats();
+            startTimer();
+            hideSuccessMessage();
+        }
+
+        /* Hint system - shows a random unmatched pair briefly */
+        function showHint() {
+            if (!gameState.gameActive || gameState.flippedCards.length > 0) return;
+
+            // Find unmatched cards
+            const unmatchedCards = [];
+            document.querySelectorAll('.card:not(.matched)').forEach((card, index) => {
+                if (!card.classList.contains('matched')) {
+                    unmatchedCards.push(parseInt(card.dataset.index));
+                }
+            });
+
+            if (unmatchedCards.length < 2) return;
+
+            // Find a matching pair in unmatched cards
+            const bacteriaTypes = {};
+            unmatchedCards.forEach(cardIndex => {
+                const bacteriaName = gameState.cards[cardIndex].name;
+                if (!bacteriaTypes[bacteriaName]) {
+                    bacteriaTypes[bacteriaName] = [];
+                }
+                bacteriaTypes[bacteriaName].push(cardIndex);
+            });
+
+            // Show hint for first available pair
+            for (let bacteriaName in bacteriaTypes) {
+                if (bacteriaTypes[bacteriaName].length >= 2) {
+                    const hintCards = bacteriaTypes[bacteriaName].slice(0, 2);
+                    
+                    hintCards.forEach(cardIndex => {
+                        const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
+                        cardElement.classList.add('flipped');
+                    });
+
+                    // Hide hint after 1.5 seconds
+                    setTimeout(() => {
+                        hintCards.forEach(cardIndex => {
+                            const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
+                            cardElement.classList.remove('flipped');
+                        });
+                    }, 1500);
+                    break;
+                }
+            }
+        }
+
+        /* Additional utility functions for enhanced gameplay */
+        
+        // Keyboard support for accessibility
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'n':
+                case 'N':
+                    startNewGame();
+                    break;
+                case 'r':
+                case 'R':
+                    resetGame();
+                    break;
+                case 'h':
+                case 'H':
+                    showHint();
+                    break;
+            }
+        });
+
+        // Performance tracking (console logging for debugging)
+        console.log('Gut Microbiome Memory Game initialized successfully!');
+        console.log('Game features: 8 bacteria pairs, flip animations, timer, move counter');
+        console.log('Keyboard shortcuts: N (new game), R (reset), H (hint)');
+    </script>
+</body>
+</html>
