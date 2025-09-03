@@ -1,0 +1,283 @@
+<!--
+   Goal:
+   #1    Pull in CSV data
+   #2.a. Explore data #1: Create summary of statistics
+   #2.b. Explore data #2: 
+   #3    Make overall conclusion
+   
+   Pre-requisite: 'Install'/start a simple web server (chrome and firefox for security purposes won't allow certain Javascript actions), imagine if a web browser script could access your local drive (hence the protection)
+   
+   #Option 1 (favorable option)
+   #https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server
+   
+   Step 1: Install pthon and run the following on the command prompt (Windows) or powershell or terminal (Mac)
+   		python3 -m http.server 
+   Step 2: Go to 
+   Step 3: Select file 
+   
+   #Option 2:
+   
+   # Run chrome with the allow file extension
+    "C:\PathTo\Chrome.exe" --allow-file-access-from-files
+   
+   #Option 3:
+   
+    Install Web Server for Chrome
+   
+    https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb?hl=en
+   -->
+<!-- Data: https://research.stlouisfed.org/useraccount/datalists/239255/download-->
+<!DOCTYPE html>
+<style> /* set the CSS */
+
+.line {
+  fill: none;
+  stroke: green;   /* changed to green */
+  stroke-width: 2px;
+}
+
+</style>
+<html>
+   <head>
+      <title>Poverty, US, LA - Visualization and Analysis</title>
+      <meta charset="UTF-8">
+      <!-- Pull in d3.js -->
+      <script src="d3.v5.min.js"></script>
+   </head>
+   <body>
+      <h1> Has the poverty rate increased/decreased in the US and LA County?</h1>
+
+      <p>Data Source: Federal Reserve Economic Data
+      </p>
+      <ul> </ul>
+      <table class="objecttable">
+         <thead>
+            <tr>
+               <th>label</th>
+               <th>min</th>
+               <th>max</th>
+               <th>mean</th>
+               <th>median</th>
+               <th>standard deviation</th>
+            </tr>
+         </thead>
+         <tbody></tbody>
+      </table>
+      <!-- Create a div where the graph will take place -->
+      <div id="legend"></div>
+      <script>
+         //#Option 1
+		 //var filePath = "/Users/user/Desktop/"
+		 var filePath = ""
+		 var fileName = "PovertyRate.csv"
+		 filePathName = filePath + fileName;
+
+		 //Top 1% percentile share of total pre-tax national income
+		 //Top 10% percentile share of total pre-tax national income
+
+		 //(Optional): Promises, https://github.com/d3/d3/blob/5f0bea71c6f0c1928fbb0394def13641b38a3e4b/CHANGES.md
+		 //Basically to handle asynchronous callbacks
+
+		 //CSV file processing
+		 //pull in the csv file and assign to the variable
+		 var dataset = d3.csv(filePathName).then(function(data) {
+		         return data;
+		     })
+		     .catch(function(error) {
+		         // handle error   
+		     })
+
+		//We want to use this numerical array for a table!
+		 var passLoadedDataSafelyAsUnlabeledArray = dataset.then(function(value) {
+		     return Promise.all(value.map(function(results) {
+		     	//Here we return WITHOUT column headers
+		         return [results.Year, results.PercentPovertyLevelInUS, results.PercentPovertyLevelInLACounty];
+		     }))
+		 });
+
+		 //We want to use this labeled data for the chart!
+		 var passLoadedDataSafelyAsLabeledArray = dataset.then(function(value) {
+		     return Promise.all(value.map(function(results) {
+		         //Here we return WITH column headers
+		         return results
+		     }))
+		 });
+
+		 //Use data
+		 //perform various d3 functions to create a). table
+		 passLoadedDataSafelyAsUnlabeledArray.then(function(data) {
+		     //Pass data further to d3...
+		     var parseTime = d3.timeParse("%Y");
+
+		     //Transpose data
+		     restackedData = d3.transpose(data)
+
+		     //Setup variable for descriptive statistics
+		     var descriptiveStatistics;
+
+		     //convert/ensure CSV data types are correct (i.e.
+		     //+d = integer)
+		     data.forEach(function(d) {
+		         d.Year = parseTime(d.Year);
+		         d.PercentPovertyLevelInUS = +d.PercentPovertyLevelInUS;
+		         d.PercentPovertyLevelInLACounty = +d.PercentPovertyLevelInLACounty;
+		     });
+
+		     result = []
+		     labels=["Percent Poverty Level In US",
+		     "Percent Poverty Level In Los Angeles County"]
+
+		     var i;
+		     for (i = 1; i < restackedData.length; i++) { // i = 1 to skip the 'Year'
+   		     	 
+		         result[i - 1] = [
+		     		 labels[i-1],
+		     		 Math.round(d3.min(restackedData[i]) * 100) / 100,
+		             Math.round(d3.max(restackedData[i]) * 100) / 100,
+		             Math.round(d3.mean(restackedData[i]) * 100) / 100,
+		             Math.round(d3.median(restackedData[i]) * 100) / 100,
+		             Math.round(d3.deviation(restackedData[i]) * 100) / 100
+		         ]
+		     }
+
+		     descriptiveStatistics = result
+
+		     var tr = d3.select(".objecttable tbody")
+		         .selectAll("tr")
+		         .data(descriptiveStatistics)
+		         .enter().append("tr");
+
+		     var td = tr.selectAll("td")
+		         .data(function(d, i) {
+		             return Object.values(d);
+		         })
+		         .enter().append("td")
+		         .text(function(d) {
+		             return d;
+		         });
+
+		 });
+
+		 //perform various d3 functions to create a). chart
+		 passLoadedDataSafelyAsLabeledArray.then(function(data) {
+
+		     // set the dimensions and margins of the graph
+		     var margin = {
+		             top: 20,
+		             right: 20,
+		             bottom: 50,
+		             left: 70
+		         },
+		         width = 800 - margin.left - margin.right, /* Changed 960 to 800 */
+		         height = 400 - margin.top - margin.bottom; /* Changed 500 to 400 */
+
+		     // parse the date / time 
+		     var parseTime = d3.timeParse("%Y");
+
+		     // set the ranges
+		     var x = d3.scaleTime().range([0, width]);
+		     var y = d3.scaleLinear().range([height, 0]);
+
+		     //d3.line generator produces a path data string given an array of co-ordinates
+		     // define the 1st line
+		     var valueline = d3.line()
+		         .x(function(d) {
+		             return x(d.Year);
+		         })
+		         .y(function(d) {
+		             return y(d.PercentPovertyLevelInUS);
+		         });
+
+		     // define the 2nd line
+		     var valueline2 = d3.line()
+		         .x(function(d) {
+		             return x(d.Year);
+		         })
+		         .y(function(d) {
+		             return y(d.PercentPovertyLevelInLACounty);
+		         });
+
+		     // append the svg obgect to the body of the page
+		     // appends a 'group' element to 'svg'
+		     // moves the 'group' element to the top left margin
+		     var svg = d3.select("body").append("svg")
+		         .attr("width", width + margin.left + margin.right)
+		         .attr("height", height + margin.top + margin.bottom)
+		         .append("g")
+		         .attr("transform",
+		             "translate(" + margin.left + "," + margin.top + ")");
+
+		     // format the data
+		     data.forEach(function(d) {
+		         d.Year = parseTime(d.Year);
+		         d.PercentPovertyLevelInUS = +d.PercentPovertyLevelInUS;
+		         d.PercentPovertyLevelInLACounty = +d.PercentPovertyLevelInLACounty;
+		     });
+
+		     // Scale the range of the data
+		     x.domain(d3.extent(data, function(d) {
+		         return d.Year;
+		     }));
+		     y.domain([0, d3.max(data, function(d) {
+		         return Math.max(d.PercentPovertyLevelInUS, d.PercentPovertyLevelInLACounty);
+		     })]);
+
+		     // Add the valueline path.
+		     svg.append("path")
+		         .data([data])
+		         .attr("class", "line")
+		         .attr("d", valueline);
+
+		     // Add the valueline2 path.
+		     svg.append("path")
+		         .data([data])
+		         .attr("class", "line")
+		         .style("stroke", "purple") //Changed red to purple
+		         .attr("d", valueline2);
+
+		     // Add the X Axis
+		     svg.append("g")
+		         .attr("transform", "translate(0," + height + ")")
+		         .call(d3.axisBottom(x));
+
+		     // Add the X Axis label
+		     svg.append("text")
+			    .attr("class", "x label")
+			    .attr("text-anchor", "end")
+			    .attr("x", width)
+			    .attr("y", height + 48)
+			    .text("Years");
+
+		     // Add the Y Axis
+		     svg.append("g")
+		         .call(d3.axisLeft(y));
+
+		     // Add the Y Axis label
+		     svg.append("text")
+			    .attr("class", "y label")
+			    .attr("text-anchor", "end")
+			    .attr("y", - 48)
+			    .attr("dy", ".75em")
+			    .attr("transform", "rotate(-90)")
+			    .text("% of Population in Poverty");
+
+		     // Add title
+		     svg.append("text")
+		        .attr("x", (width / 2))             
+		        .attr("y", 0 - (margin.top / 2))
+		        .attr("text-anchor", "middle")  
+		        .style("font-size", "12px") /* changed 14 to 12 */
+		        .style("text-decoration", "underline")  
+		        .text("Percent of People in USA (green) and LA County (purple) in Poverty"); /* changed colors */
+
+
+		 });
+      </script>
+   </body>
+   <style type="text/css">
+   	
+	table { width: 640px; } /* Make table wider */  
+	td, th { border: 1px solid #CCC; } /* Add borders to cells */  
+
+   </style>
+</html>
