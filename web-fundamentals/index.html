@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Fundamentals Demo</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .demo-section h2 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+
+        .interactive-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .interactive-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-box {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            display: inline-block;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .color-box:hover {
+            transform: scale(1.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .data-table th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HTML, CSS & JavaScript Demo</h1>
+        <p class="subtitle">Building blocks of web-based visualizations</p>
+
+        <div class="demo-section">
+            <h2>HTML Structure</h2>
+            <p>This page demonstrates semantic HTML with proper document structure, headings, paragraphs, tables, and interactive elements.</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HTML</td>
+                        <td>Structure & Content</td>
+                        <td>This table structure</td>
+                    </tr>
+                    <tr>
+                        <td>CSS</td>
+                        <td>Styling & Layout</td>
+                        <td>Colors, fonts, animations</td>
+                    </tr>
+                    <tr>
+                        <td>JavaScript</td>
+                        <td>Interactivity & Logic</td>
+                        <td>Button clicks, data manipulation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-section">
+            <h2>CSS Styling</h2>
+            <p>Modern CSS features including gradients, flexbox, grid, animations, and responsive design.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="visitor-count">0</div>
+                    <div>Page Visits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="button-clicks">0</div>
+                    <div>Button Clicks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="color-changes">0</div>
+                    <div>Color Changes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>JavaScript Interactivity</h2>
+            <p>Click buttons to see JavaScript in action:</p>
+            
+            <button class="interactive-button" onclick="showAlert()">Show Alert</button>
+            <button class="interactive-button" onclick="changeBackgroundColor()">Change Colors</button>
+            <button class="interactive-button" onclick="addDataRow()">Add Data</button>
+            <button class="interactive-button" onclick="toggleSection()">Toggle Section</button>
+            
+            <div id="color-demo" style="margin: 20px 0;">
+                <div class="color-box" style="background: #ff6b6b;" onclick="selectColor('#ff6b6b')"></div>
+                <div class="color-box" style="background: #4ecdc4;" onclick="selectColor('#4ecdc4')"></div>
+                <div class="color-box" style="background: #45b7d1;" onclick="selectColor('#45b7d1')"></div>
+                <div class="color-box" style="background: #f9ca24;" onclick="selectColor('#f9ca24')"></div>
+            </div>
+
+            <div id="dynamic-content" class="hidden">
+                <h3>Dynamic Content Section</h3>
+                <p>This section was toggled using JavaScript! It demonstrates DOM manipulation and event handling.</p>
+                <p id="current-time"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== JAVASCRIPT CODE =====
+           This section demonstrates JavaScript fundamentals including:
+           - DOM manipulation and event handling
+           - Variable management and data processing
+           - Dynamic content updates
+           - Asynchronous functions and intervals
+           - Modern ES6+ syntax where appropriate
+        */
+        
+        // Global variables to track user interactions
+        let clickCount = 0;           // Counter for button clicks
+        let colorChangeCount = 0;     // Counter for color changes
+        let visitCount = 1;           // Page visit counter
+
+        /* Event listener for when DOM content is fully loaded
+           This ensures all HTML elements are available before JavaScript runs */
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();      // Initialize statistics display
+            updateTime();       // Set initial time
+            // Update time every second (1000 milliseconds)
+            setInterval(updateTime, 1000);
+        });
+
+        /* Function to display JavaScript alert dialog
+           Demonstrates basic user interaction and string concatenation */
+        function showAlert() {
+            clickCount++;       // Increment click counter
+            updateStats();      // Update display
+            // Show alert with dynamic message
+            alert('Hello! This is JavaScript in action. You have clicked ' + clickCount + ' buttons.');
+        }
+
+        /* Function to change background gradient dynamically
+           Demonstrates array manipulation and random selection */
+        function changeBackgroundColor() {
+            clickCount++;
+            colorChangeCount++;
+            
+            // Array of CSS gradient backgrounds
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+            ];
+            
+            // Select random color from array using Math.random()
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            // Apply new background using DOM style manipulation
+            document.body.style.background = randomColor;
+            updateStats();
+        }
+
+        /* Function to dynamically add table rows
+           Demonstrates DOM manipulation and HTML injection */
+        function addDataRow() {
+            clickCount++;
+            // Query selector to find table body element
+            const table = document.querySelector('.data-table tbody');
+            // Insert new row at the end
+            const newRow = table.insertRow();
+            // Set HTML content for the new row
+            newRow.innerHTML = `
+                <td>D3.js</td>
+                <td>Data Visualization</td>
+                <td>Interactive charts & graphs</td>
+            `;
+            // Add CSS animation class
+            newRow.classList.add('fade-in');
+            updateStats();
+        }
+
+        /* Function to toggle visibility of content sections
+           Demonstrates CSS class manipulation and conditional logic */
+        function toggleSection() {
+            clickCount++;
+            // Get element by ID
+            const section = document.getElementById('dynamic-content');
+            // Toggle CSS class (add if missing, remove if present)
+            section.classList.toggle('hidden');
+            // Add animation only when showing the section
+            if (!section.classList.contains('hidden')) {
+                section.classList.add('fade-in');
+            }
+            updateStats();
+        }
+
+        /* Function to handle color selection
+           Demonstrates CSS style manipulation and parameter passing */
+        function selectColor(color) {
+            colorChangeCount++;
+            // Apply border color to container element
+            document.querySelector('.container').style.borderLeft = `8px solid ${color}`;
+            updateStats();
+        }
+
+        /* Function to update statistics display
+           Demonstrates textContent property for safe text updates */
+        function updateStats() {
+            document.getElementById('visitor-count').textContent = visitCount;
+            document.getElementById('button-clicks').textContent = clickCount;
+            document.getElementById('color-changes').textContent = colorChangeCount;
+        }
+
+        /* Function to update real-time clock
+           Demonstrates Date object and string formatting */
+        function updateTime() {
+            const now = new Date();                    // Current date/time
+            const timeString = now.toLocaleTimeString(); // Format as local time string
+            const timeElement = document.getElementById('current-time');
+            // Check if element exists before updating (defensive programming)
+            if (timeElement) {
+                timeElement.textContent = `Current time: ${timeString}`;
+            }
+        }
+
+        /* Data processing simulation function
+           Demonstrates array methods, reduce function, and mathematical operations
+           Similar to how D3.js processes data for visualizations */
+        function processData() {
+            // Sample dataset (similar to CSV data structure)
+            const sampleData = [
+                { year: 2020, value: 12.5 },
+                { year: 2021, value: 14.2 },
+                { year: 2022, value: 11.8 },
+                { year: 2023, value: 13.1 }
+            ];
+            
+            // Calculate average using reduce function (functional programming)
+            const average = sampleData.reduce((sum, item) => sum + item.value, 0) / sampleData.length;
+            // Console logging for debugging purposes
+            console.log('Sample data processed. Average value:', average.toFixed(2));
+            return average;
+        }
+
+        // Execute data processing function on page load
+        processData();
+    </script>
+</body>
+</html>
